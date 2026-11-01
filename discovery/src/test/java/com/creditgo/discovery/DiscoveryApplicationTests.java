@@ -1,10 +1,10 @@
-package com.creditgo.clients;
+package com.creditgo.discovery;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ClientsApplicationTests {
+class DiscoveryApplicationTests {
 
     @Test
     void contextLoads() {

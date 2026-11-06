@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.creditgo</groupId>
-    <artifactId>service-clients</artifactId>
+    <artifactId>decaissements</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>service-clients</name>
-    <description>service-clients</description>
+    <name>service-decaissements</name>
+    <description>service-decaissements</description>
     <url/>
     <licenses>
         <license/>
@@ -50,6 +50,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.8.10</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.cloud</groupId>

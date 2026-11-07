@@ -97,6 +97,7 @@ public class ClientsService {
 
     public Collateral creerCollateral(Collateral collateral) {
         valider(collateral.getClientId() != null);
+        getClientById(collateral.getClientId());
         valider(collateral.getType() != null && !collateral.getType().isBlank());
         valider(collateral.getValeur() != null && collateral.getValeur().compareTo(BigDecimal.ZERO) >= 0);
         valider(collateral.getDescription() != null && !collateral.getDescription().isBlank());

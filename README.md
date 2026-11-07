@@ -67,6 +67,17 @@ Credit enrichment also requests client, collateral, and disbursement data from t
 ├── discovery/                # Service registry "eureka"
 └── README.md
 ```
+## Ports
+
+| Service              | Port |
+| -------------------- | ---- |
+| API Gateway          | 8080 |
+| Eureka (Discovery)   | 8761 |
+| Clients              | 8081 |
+| Décaissements        | 8082 |
+| Credit               | 8083 |
+| Config Server        | 8888 |
+
 
 The root `pom.xml` aggregates all application modules, so Maven and IntelliJ can import them from the repository root. Open the root POM as a Maven project or reload Maven after pulling changes. Start each module from the root with `mvn -pl <module> spring-boot:run`, such as `mvn -pl config-server spring-boot:run`.
 

@@ -32,6 +32,7 @@ public class DecaissementsController {
     @Operation(summary = "Create a disbursement", description = "Deducts montant from the treasury account; rejects if soldeDisponible < montant")
     @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = DisbursementResponse.class)))
     @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping
     public DisbursementResponse creerVersement(@Valid @RequestBody CreateDisbursementRequest request) {
         return decaissementsService.creerVersement(request);
     }
@@ -90,6 +91,7 @@ public class DecaissementsController {
     @Operation(summary = "Create a treasury account")
     @ApiResponse(responseCode = "201", description = "Created", content = @Content(schema = @Schema(implementation = TreasuryAccountResponse.class)))
     @ResponseStatus(HttpStatus.CREATED)
+    @PostMapping("/comptes")
     public TreasuryAccountResponse creerCompte(@Valid @RequestBody CreateTreasuryAccountRequest request) {
         return decaissementsService.creerCompte(request);
     }

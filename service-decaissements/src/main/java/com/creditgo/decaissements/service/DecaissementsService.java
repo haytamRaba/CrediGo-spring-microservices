@@ -58,13 +58,13 @@ public class DecaissementsService {
 
         compte.setSoldeDisponible(compte.getSoldeDisponible().subtract(request.getMontant()));
         treasuryAccountRepository.save(compte);
+        creditFeignClient.activateSchedule(request.getLoanApplicationId());
 
         return new DisbursementResponse(virement);
     }
 
     private void disvalider(Long loanApplicationId, Long treasuryAccountId, BigDecimal montant) {
         creditFeignClient.validateDisbursement(loanApplicationId, montant);
-        creditFeignClient.activateSchedule(loanApplicationId);
         if (treasuryAccountId == null || treasuryAccountId <= 0) {
             throw new ResourceNotFoundException("ID du compte treasury invalide : " + treasuryAccountId);
         }

@@ -1,0 +1,12 @@
+$kind: http-request
+method: POST
+url: '{{creditBaseUrl}}/api/loan-applications/{{loanApplicationId}}/remarque'
+order: 4000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Repayment schedule is generated', () => {
+        pm.response.to.have.status(200);
+        pm.expect(pm.response.json().loanApplicationId).to.eql(Number(pm.environment.get('loanApplicationId')));
+      });

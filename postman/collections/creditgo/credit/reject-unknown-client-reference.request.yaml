@@ -1,0 +1,28 @@
+$kind: http-request
+method: POST
+url: '{{creditBaseUrl}}/api/loan-applications'
+order: 6000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "clientId": 99999999,
+      "montantDemande": 5000,
+      "dureeMois": 12,
+      "tauxPropose": 4.5,
+      "motif": "Must be rejected"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Unknown client reference is rejected as not found', () => pm.response.to.have.status(404));
+      pm.sendRequest(`${pm.environment.get('creditBaseUrl')}/api/loan-applications`, (error, response) => {
+        pm.test('Rejected request did not create a loan application', () => {
+          pm.expect(error).to.equal(null);
+          pm.expect(response.json().some(application => application.clientId === 99999999)).to.eql(false);
+        });
+      });

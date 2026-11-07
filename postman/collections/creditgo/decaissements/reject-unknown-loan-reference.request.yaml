@@ -1,0 +1,26 @@
+$kind: http-request
+method: POST
+url: '{{decaissementsBaseUrl}}/api/disbursements'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "loanApplicationId": 99999999,
+      "treasuryAccountId": {{treasuryAccountId}},
+      "montant": 1000
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Unknown loan reference is rejected before disbursement creation', () => pm.response.to.have.status(404));
+      pm.sendRequest(`${pm.environment.get('decaissementsBaseUrl')}/api/disbursements/loan-application/99999999`, (error, response) => {
+        pm.test('Rejected request did not create a disbursement', () => {
+          pm.expect(error).to.equal(null);
+          pm.expect(response.json()).to.be.an('array').that.is.empty;
+        });
+      });

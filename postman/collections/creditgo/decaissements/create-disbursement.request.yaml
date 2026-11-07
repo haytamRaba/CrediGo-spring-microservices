@@ -1,0 +1,25 @@
+$kind: http-request
+method: POST
+url: '{{decaissementsBaseUrl}}/api/disbursements'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "loanApplicationId": {{loanApplicationId}},
+      "treasuryAccountId": {{treasuryAccountId}},
+      "montant": 1000
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Disbursement is created after credit validation', () => pm.response.to.have.status(201));
+      const disbursement = pm.response.json();
+      pm.test('Disbursement references the approved loan and treasury account', () => {
+        pm.expect(disbursement.loanApplicationId).to.eql(Number(pm.environment.get('loanApplicationId')));
+        pm.expect(disbursement.treasuryAccountId).to.eql(Number(pm.environment.get('treasuryAccountId')));
+      });

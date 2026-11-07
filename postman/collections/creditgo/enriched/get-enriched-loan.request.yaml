@@ -1,0 +1,16 @@
+$kind: http-request
+method: GET
+url: '{{creditBaseUrl}}/api/enriched/loan-applications/{{loanApplicationId}}'
+order: 1000
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Enriched loan aggregates client, collateral, schedule, and disbursement data', () => {
+        pm.response.to.have.status(200);
+        const loan = pm.response.json();
+        pm.expect(loan.client.id).to.eql(Number(pm.environment.get('clientId')));
+        pm.expect(loan.garanties).to.be.an('array').that.is.not.empty;
+        pm.expect(loan.echeancier.loanApplicationId).to.eql(Number(pm.environment.get('loanApplicationId')));
+        pm.expect(loan.deconcilement.loanApplicationId).to.eql(Number(pm.environment.get('loanApplicationId')));
+      });

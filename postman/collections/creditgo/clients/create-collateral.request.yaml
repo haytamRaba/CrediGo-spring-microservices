@@ -1,0 +1,23 @@
+$kind: http-request
+method: POST
+url: '{{clientsBaseUrl}}/api/clients/{{clientId}}/collaterals'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "type": "IMMOBILIER",
+      "valeur": 25000,
+      "description": "CreditGo integration collateral"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Collateral is created for the referenced client', () => {
+        pm.response.to.have.status(201);
+        pm.expect(pm.response.json().clientId).to.eql(Number(pm.environment.get('clientId')));
+      });

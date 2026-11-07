@@ -1,0 +1,27 @@
+$kind: http-request
+method: POST
+url: '{{creditBaseUrl}}/api/loan-applications'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "clientId": {{clientId}},
+      "montantDemande": 5000,
+      "dureeMois": 12,
+      "tauxPropose": 4.5,
+      "motif": "CreditGo integration"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Loan application is created after client reference validation', () => pm.response.to.have.status(201));
+      const application = pm.response.json();
+      pm.test('Loan application references the created client', () => {
+        pm.expect(application.clientId).to.eql(Number(pm.environment.get('clientId')));
+      });
+      pm.environment.set('loanApplicationId', String(application.id));

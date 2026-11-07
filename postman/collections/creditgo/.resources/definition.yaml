@@ -1,0 +1,4 @@
+$kind: collection
+name: CreditGo service integration
+description: Synchronous client, loan, collateral, treasury, disbursement, and enriched-loan flows.
+order: 1000

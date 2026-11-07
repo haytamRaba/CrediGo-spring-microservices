@@ -1,0 +1,21 @@
+$kind: http-request
+method: PUT
+url: '{{creditBaseUrl}}/api/loan-applications/{{loanApplicationId}}/etudier'
+order: 2000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "statut": "EN_ETUDE"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Loan application enters study', () => {
+        pm.response.to.have.status(200);
+        pm.expect(pm.response.json().statut).to.eql('EN_ETUDE');
+      });

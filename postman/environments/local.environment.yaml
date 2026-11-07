@@ -1,0 +1,30 @@
+name: CreditGo Local
+values:
+  - key: clientsBaseUrl
+    value: 'http://localhost:8081'
+    enabled: true
+    type: default
+  - key: creditBaseUrl
+    value: 'http://localhost:8082'
+    enabled: true
+    type: default
+  - key: decaissementsBaseUrl
+    value: 'http://localhost:8083'
+    enabled: true
+    type: default
+  - key: testEmail
+    value: ''
+    enabled: true
+    type: default
+  - key: clientId
+    value: ''
+    enabled: true
+    type: default
+  - key: loanApplicationId
+    value: ''
+    enabled: true
+    type: default
+  - key: treasuryAccountId
+    value: ''
+    enabled: true
+    type: default

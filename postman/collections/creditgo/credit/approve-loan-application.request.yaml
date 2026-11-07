@@ -1,0 +1,21 @@
+$kind: http-request
+method: PUT
+url: '{{creditBaseUrl}}/api/loan-applications/{{loanApplicationId}}/accorder'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "statut": "ACCORDE"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Loan application is approved using the client ID Feign lookup', () => {
+        pm.response.to.have.status(200);
+        pm.expect(pm.response.json().statut).to.eql('ACCORDE');
+      });

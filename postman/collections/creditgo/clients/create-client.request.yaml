@@ -1,0 +1,29 @@
+$kind: http-request
+method: POST
+url: '{{clientsBaseUrl}}/api/clients'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "nom": "CreditGo Integration",
+      "email": "{{testEmail}}",
+      "revenusMensuels": 12000,
+      "scoreInterne": 85,
+      "statut": "ACTIVE"
+    }
+scripts:
+  - type: beforeRequest
+    language: text/javascript
+    code: |-
+      pm.environment.set('testEmail', `creditgo-${Date.now()}@example.test`);
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Client is created', () => pm.response.to.have.status(201));
+      const client = pm.response.json();
+      pm.test('Client response has an identifier', () => pm.expect(client.id).to.exist);
+      pm.environment.set('clientId', String(client.id));

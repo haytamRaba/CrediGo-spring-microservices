@@ -1,0 +1,22 @@
+$kind: http-request
+method: POST
+url: '{{decaissementsBaseUrl}}/api/disbursements/comptes'
+order: 1000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "libelle": "CreditGo integration treasury",
+      "soldeDisponible": 100000
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test('Treasury account is created', () => pm.response.to.have.status(201));
+      const account = pm.response.json();
+      pm.test('Treasury account has an identifier', () => pm.expect(account.id).to.exist);
+      pm.environment.set('treasuryAccountId', String(account.id));

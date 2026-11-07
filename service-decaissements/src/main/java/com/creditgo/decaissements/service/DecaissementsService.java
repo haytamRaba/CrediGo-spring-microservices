@@ -1,8 +1,8 @@
 package com.creditgo.decaissements.service;
 
+import com.creditgo.decaissements.client.CreditFeignClient;
 import com.creditgo.decaissements.dto.CreateDisbursementRequest;
 import com.creditgo.decaissements.dto.CreateTreasuryAccountRequest;
-import com.creditgo.decaissements.dto.DisbursementResponse;
 import com.creditgo.decaissements.dto.DisbursementResponse;
 import com.creditgo.decaissements.dto.TreasuryAccountResponse;
 import com.creditgo.decaissements.entity.Disbursement;
@@ -25,11 +25,14 @@ public class DecaissementsService {
 
     private final DisbursementRepository disbursementRepository;
     private final TreasuryAccountRepository treasuryAccountRepository;
+    private final CreditFeignClient creditFeignClient;
 
     public DecaissementsService(DisbursementRepository disbursementRepository,
-                                 TreasuryAccountRepository treasuryAccountRepository) {
+                                 TreasuryAccountRepository treasuryAccountRepository,
+                                 CreditFeignClient creditFeignClient) {
         this.disbursementRepository = disbursementRepository;
         this.treasuryAccountRepository = treasuryAccountRepository;
+        this.creditFeignClient = creditFeignClient;
     }
 
     public DisbursementResponse creerVersement(CreateDisbursementRequest request) {
@@ -43,6 +46,8 @@ public class DecaissementsService {
                     "Solde insuffisant : " + compte.getSoldeDisponible() + " < " + request.getMontant());
         }
 
+        disvalider(request.getLoanApplicationId(), request.getTreasuryAccountId(), request.getMontant());
+
         Disbursement virement = new Disbursement(
                 request.getLoanApplicationId(),
                 request.getTreasuryAccountId(),
@@ -55,6 +60,14 @@ public class DecaissementsService {
         treasuryAccountRepository.save(compte);
 
         return new DisbursementResponse(virement);
+    }
+
+    private void disvalider(Long loanApplicationId, Long treasuryAccountId, BigDecimal montant) {
+        creditFeignClient.validateDisbursement(loanApplicationId, montant);
+        creditFeignClient.activateSchedule(loanApplicationId);
+        if (treasuryAccountId == null || treasuryAccountId <= 0) {
+            throw new ResourceNotFoundException("ID du compte treasury invalide : " + treasuryAccountId);
+        }
     }
 
     private void valider(boolean valid) {
@@ -121,4 +134,48 @@ public class DecaissementsService {
         entity = treasuryAccountRepository.save(entity);
         return new TreasuryAccountResponse(entity);
     }
+
+    public DisbursementResponse effectiveDisbursement(Long id) {
+        Disbursement virement = disbursementRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Versement introuvable avec l'id : " + id));
+
+        if (virement.estEffectue()) {
+            throw new ValueNotValidException("Le versement est déjà effectif");
+        }
+
+        virement.setStatut(Disbursement.Statut.EFFECTUE.name());
+        virement = disbursementRepository.save(virement);
+
+        return new DisbursementResponse(virement);
+    }
+
+    public DisbursementResponse testerVersement(CreateDisbursementRequest request) {
+        TreasuryAccount compte = treasuryAccountRepository.findById(request.getTreasuryAccountId())
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Compte treasury introuvable avec l'id : " + request.getTreasuryAccountId()));
+
+        if (compte.getSoldeDisponible().compareTo(request.getMontant()) < 0) {
+            throw new InsufficientFundsException(
+                    "Solde insuffisant : " + compte.getSoldeDisponible() + " < " + request.getMontant());
+        }
+
+        creditFeignClient.validateDisbursement(request.getLoanApplicationId(), request.getMontant());
+        creditFeignClient.activateSchedule(request.getLoanApplicationId());
+        return new DisbursementResponse();
+    }
+
+    public DisbursementResponse effectuerVersement(Long id) {
+        Disbursement virement = disbursementRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Versement introuvable avec l'id : " + id));
+
+        if (virement.estEffectue()) {
+            throw new ValueNotValidException("Le versement est déjà effectif");
+        }
+
+        virement.setStatut(Disbursement.Statut.EFFECTUE.name());
+        virement = disbursementRepository.save(virement);
+
+        return new DisbursementResponse(virement);
+    }
+
 }

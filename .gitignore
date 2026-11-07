@@ -38,6 +38,7 @@ out/
 # VS Code
 # ==============================
 .vscode/
+.idea
 
 # ==============================
 # Logs
@@ -65,6 +66,7 @@ Desktop.ini
 *.tmp
 *.swp
 *.bak
+.freebuff
 
 # ==============================
 # Spring Boot

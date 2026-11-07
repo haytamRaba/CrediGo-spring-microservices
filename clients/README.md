@@ -9,8 +9,9 @@ requests to look up a client and retrieve collateral details.
 Run each command in a separate terminal, in order:
 
 ```powershell
-mvn -f discovery/pom.xml spring-boot:run
-mvn -f clients/pom.xml spring-boot:run
+mvn -pl config-server spring-boot:run
+mvn -pl discovery spring-boot:run
+mvn -pl clients spring-boot:run
 ```
 
 The service registers as `clients` on port `8081`. It uses Spring Data JPA and H2. With the datasource properties currently commented out, Spring Boot uses its embedded in-memory H2 database defaults.

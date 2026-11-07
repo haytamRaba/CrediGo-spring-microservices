@@ -69,3 +69,8 @@ jobs:
             done
             exit 1
           fi
+
+      - name: Run Postman integration collection
+        uses: postmanlabs/postman-cli-action@v1
+        with:
+          command: collection run postman/collections/creditgo --environment postman/environments/local.environment.yaml --no-report-events

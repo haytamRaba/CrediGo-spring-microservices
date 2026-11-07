@@ -33,4 +33,4 @@ Base path: `/api/disbursements`
 Swagger UI is configured at `/swagger-ui.html`
 the OpenAPI document is at `/api-docs`.
 
-!!! API Gateway currently routes `/api/decaissements/**`
+! The service currently  service uses `/api/disbursements/**`.

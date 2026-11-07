@@ -34,7 +34,6 @@ The script exits nonzero if a configuration response is empty or Maven fails. It
 | Decaissements | `GET /api/disbursements` | HTTP success |
 | Gateway to Clients | `GET /api/clients` through port `8080` | HTTP success |
 
-Start each application in a separate terminal, in this order:
 
 ```powershell
 mvn -pl config-server spring-boot:run
@@ -52,6 +51,19 @@ py -3 scripts/smoke-test.py
 ```
 
 The smoke script only issues `GET` requests
+
+## Postman integration collection
+
+`postman/collections/creditgo` is the saved end-to-end request sequence.
+
+
+```powershell
+postman collection run postman/collections/creditgo --environment postman/environments/local.environment.yaml --no-report-events
+```
+
+The collection writes test data to the running service databases. 
+The configured H2 databases are in-memory and reset when their services restart.
+CI runs this same collection after starting the modules.
 
 ## CI execution
 

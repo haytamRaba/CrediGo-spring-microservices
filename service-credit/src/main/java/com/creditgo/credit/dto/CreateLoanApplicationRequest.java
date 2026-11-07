@@ -4,11 +4,13 @@ import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 public class CreateLoanApplicationRequest {
 
     @NotNull(message = "Le client est obligatoire")
+    @Positive(message = "L'id du client doit être positif")
     private Long clientId;
 
     @NotNull(message = "Le montant demandé est obligatoire")

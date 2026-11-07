@@ -109,9 +109,9 @@ public class CreditController {
     }
 
     @PostMapping("/{id}/disbursement-validation")
-    public void validateDisbursement(@PathVariable Long id, @RequestParam BigDecimal montant) {
-        creditService.consulterAccord(id);
+    public LoanApplicationResponse validateDisbursement(@PathVariable Long id, @RequestParam BigDecimal montant) {
         creditService.consulterMontantAccorde(id, montant);
+        return creditService.consulterAccord(id);
     }
 
     @PostMapping("/{id}/activate-schedule")

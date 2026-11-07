@@ -52,7 +52,9 @@ public class CreditService {
 
     public LoanApplicationResponse createLoanApplication(CreateLoanApplicationRequest request) {
         valider(createLoanApplicationRequestValidation(request));
-        valider(clientsFeignClient.findClientById(request.getClientId()) != null);
+        if (clientsFeignClient.findClientById(request.getClientId()) == null) {
+            throw new OpenFeignException("Le service clients n'a retourné aucun client pour l'id : " + request.getClientId());
+        }
 
         LoanApplication entity = new LoanApplication(
                 request.getClientId(),
@@ -85,6 +87,9 @@ public class CreditService {
 
         ClientResponse client = clientsFeignClient.findClientById(entity.getClientId());
         List<CollateralResponse> garanties = clientsFeignClient.findCollateralsByClientId(entity.getClientId());
+        if (client == null || garanties == null) {
+            throw new OpenFeignException("Le service clients a retourné une réponse incomplète");
+        }
 
         RepaymentScheduleResponse echeancier = getRepaymentScheduleSummary(entity.getId());
         DisbursementResponse deconcilement = getDisbursementSummary(entity.getId());
@@ -225,36 +230,11 @@ public class CreditService {
     }
 
     private Integer consulterScoreExterne(Long clientId) {
-        ClientResponse client = clientsFeignClient.findClientByEmail(clientId.toString());
+        ClientResponse client = clientsFeignClient.findClientById(clientId);
         if (client == null) {
             throw new OpenFeignException("Impossible de récupérer le client auprès de service-clients");
         }
         return client.getScoreInterne();
-    }
-
-    private void consulterClientExterne(Long clientId, Integer scoreEtude) {
-        ClientResponse client = clientsFeignClient.findClientByEmail(clientId.toString());
-        if (client == null) {
-            throw new OpenFeignException("Client introuvable auprès de service-clients");
-        }
-        if (client.getScoreInterne() == null) {
-            throw new OpenFeignException("Score client introuvable auprès de service-clients");
-        }
-        if (client.getScoreInterne() < 50) {
-            throw new OpenFeignException("Score client trop bas : " + client.getScoreInterne());
-        }
-        if (client.getStatut() == null || !client.getStatut().equalsIgnoreCase("ACTIVE")) {
-            throw new OpenFeignException("Client non actif auprès de service-clients");
-        }
-        List<CollateralResponse> garanties = clientsFeignClient.findCollateralsByClientId(clientId);
-        if (garanties == null || garanties.isEmpty()) {
-            throw new OpenFeignException("Aucune garantie trouvée pour le client");
-        }
-        for (CollateralResponse garantie : garanties) {
-            if (garantie.getValeur() == null || garantie.getValeur().compareTo(BigDecimal.ZERO) <= 0) {
-                throw new OpenFeignException("Une garantie a une valeur invalide");
-            }
-        }
     }
 
     public LoanApplicationResponse consulterAccord(Long id) {

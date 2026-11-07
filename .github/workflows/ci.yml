@@ -33,10 +33,11 @@ jobs:
       - name: Build Config Server
         run: mvn --batch-mode --no-transfer-progress -pl config-server package -DskipTests
 
-      - name: Start Config Server and check service configurations
+      - name: Run module tests and local smoke checks
         shell: bash
         run: |
           nohup java -jar config-server/target/config-server-0.0.1-SNAPSHOT.jar > config-server.log 2>&1 < /dev/null &
+          config_ready=false
           for attempt in {1..60}; do
             ready=true
             for application in clients credit decaissements api-gateway; do
@@ -46,12 +47,25 @@ jobs:
               fi
             done
             if [ "$ready" = true ]; then
-              exit 0
+              config_ready=true
+              break
             fi
             sleep 2
           done
-          cat config-server.log
-          exit 1
-
-      - name: Build and test all modules
-        run: mvn --batch-mode --no-transfer-progress verify
+          if [ "$config_ready" != true ]; then
+            cat config-server.log
+            exit 1
+          fi
+          mvn --batch-mode --no-transfer-progress verify
+          nohup java -jar discovery/target/discovery-0.0.1-SNAPSHOT.jar > discovery.log 2>&1 < /dev/null &
+          nohup java -jar clients/target/clients-0.0.1-SNAPSHOT.jar > clients.log 2>&1 < /dev/null &
+          nohup java -jar service-credit/target/credit-0.0.1-SNAPSHOT.jar > credit.log 2>&1 < /dev/null &
+          nohup java -jar service-decaissements/target/decaissements-0.0.1-SNAPSHOT.jar > decaissements.log 2>&1 < /dev/null &
+          nohup java -jar api-gateway/target/api-gateway-0.0.1-SNAPSHOT.jar > api-gateway.log 2>&1 < /dev/null &
+          if ! python3 scripts/smoke-test.py; then
+            for log in discovery.log clients.log credit.log decaissements.log api-gateway.log; do
+              echo "===== $log ====="
+              tail -n 80 "$log" || true
+            done
+            exit 1
+          fi

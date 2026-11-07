@@ -10,7 +10,7 @@ That same working-tree directory is configured as a local fallback if GitHub can
  Config Server then Eureka and the apps services.
 
 ```powershell
-mvn -f config-server/pom.xml spring-boot:run
+mvn -pl config-server spring-boot:run
 ```
 
 

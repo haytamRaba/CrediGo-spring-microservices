@@ -7,9 +7,10 @@ The Credit service manages loan applications, their approval state, and repaymen
 Run each command in a separate terminal, in order:
 
 ```powershell
-mvn -f discovery/pom.xml spring-boot:run
-mvn -f clients/pom.xml spring-boot:run
-mvn -f service-credit/pom.xml spring-boot:run
+mvn -pl config-server spring-boot:run
+mvn -pl discovery spring-boot:run
+mvn -pl clients spring-boot:run
+mvn -pl service-credit spring-boot:run
 ```
 
 Credit uses Spring Data JPA with an in-memory H2 database named `creditdb`. Data is lost when the process stops. H2 Console is enabled at `/h2-console-credit`.
@@ -40,6 +41,5 @@ These calls use Feign and Eureka; Credit has no Maven dependency on the other se
 | `POST` | `/api/loan-applications/{id}/activate-schedule` | Activate the repayment schedule |
 | `GET` | `/api/enriched/loan-applications/{id}` | Get the loan with client, collateral, schedule, and disbursement data |
 
-Swagger UI is configured at `/swagger-ui.html`; the OpenAPI document is at `/api-docs`.
+OpenAPI document is at `/api-docs`.
 
-The API Gateway currently routes `/api/credit/**`, but Credit controllers use `/api/loan-applications/**` and `/api/enriched/**`. Add a gateway rewrite or align the route before accessing these endpoints through the gateway.

@@ -9,9 +9,11 @@ schedule in Credit.
 ## Run locally
 
 ```powershell
-mvn -f discovery/pom.xml spring-boot:run
-mvn -f service-credit/pom.xml spring-boot:run
-mvn -f service-decaissements/pom.xml spring-boot:run
+mvn -pl config-server spring-boot:run
+mvn -pl discovery spring-boot:run
+mvn -pl clients spring-boot:run
+mvn -pl service-credit spring-boot:run
+mvn -pl service-decaissements spring-boot:run
 ```
 
 ## HTTP API
@@ -25,6 +27,7 @@ Base path: `/api/disbursements`
 | `GET` | `/api/disbursements/loan-application/{loanApplicationId}` | List disbursements for a loan |
 | `GET` | `/api/disbursements/treasury-account/{treasuryAccountId}` | List disbursements for a treasury account |
 | `GET` | `/api/disbursements/statut/{statut}` | List disbursements by status |
+| `POST` | `/api/disbursements` | Validate an approved loan and create a disbursement |
 | `GET` | `/api/disbursements/comptes` | List treasury accounts |
 | `GET` | `/api/disbursements/comptes/{id}` | Get a treasury account |
 | `POST` | `/api/disbursements/comptes` | Create a treasury account |
